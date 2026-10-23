@@ -6,8 +6,10 @@ import {
   BarChart3, 
   Settings,
   HelpCircle,
-  MoreVertical
+  LogIn,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '../../features/auth/useAuth';
 
 const NAV_ITEMS = [
   { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -22,9 +24,10 @@ export function Sidebar({
   activePage, 
   setActivePage, 
   leadsCount = 0, 
-  overdueCount = 0,
-  userProfile = { name: 'Arishit Thakkar', role: 'Administrator', initials: 'AT' }
+  overdueCount = 0
 }) {
+  const { user, displayName, role, initials, openAuthModal, signOut } = useAuth();
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -73,16 +76,37 @@ export function Sidebar({
           <p>Enquiry & admissions workflow organized in one place.</p>
         </div>
 
-        <div className="profile">
-          <div className="avatar">{userProfile.initials || 'AT'}</div>
-          <div className="profile-info">
-            <strong>{userProfile.name}</strong>
-            <span>{userProfile.role}</span>
+        {user ? (
+          <div className="profile">
+            <div className="avatar">{initials}</div>
+            <div className="profile-info">
+              <strong>{displayName}</strong>
+              <span style={{ textTransform: 'capitalize' }}>{role}</span>
+            </div>
+            <button 
+              className="icon-btn-ghost" 
+              onClick={signOut} 
+              aria-label="Sign out"
+              title="Sign Out"
+            >
+              <LogOut size={15} className="profile-menu" />
+            </button>
           </div>
-          <button className="icon-btn-ghost" aria-label="Profile actions">
-            <MoreVertical size={16} className="profile-menu" />
-          </button>
-        </div>
+        ) : (
+          <div className="sidebar-guest-card">
+            <div className="guest-info">
+              <strong>Guest / Demo Mode</strong>
+              <span>Sign in to access team data</span>
+            </div>
+            <button 
+              className="sidebar-signin-btn"
+              onClick={() => openAuthModal('signin')}
+            >
+              <LogIn size={13} />
+              <span>Sign In</span>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

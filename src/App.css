@@ -625,4 +625,330 @@ form input:focus, form select:focus, .search-input:focus { border-color: #7885ed
   }
 }
 
+/* Phase 4 Authentication & User Menu Polish */
+.signin-topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #5365e8;
+  color: #fff;
+  border: none;
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: .15s;
+}
+.signin-topbar-btn:hover {
+  background: #4152d2;
+}
+
+.user-menu-wrapper {
+  position: relative;
+}
+.user-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.chevron-icon {
+  color: #8b94a7;
+  transition: transform .2s ease;
+}
+.chevron-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.user-dropdown-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 230px;
+  background: #fff;
+  border: 1px solid #e8ecf4;
+  border-radius: 12px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  z-index: 100;
+  animation: authEntrance .2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dropdown-header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 6px 8px;
+}
+.dropdown-header strong {
+  font-size: 13px;
+  color: #1e293b;
+}
+.dropdown-header small {
+  font-size: 11px;
+  color: #717d92;
+  word-break: break-all;
+}
+.role-chip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eef1ff;
+  color: #4359df;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+.dropdown-divider {
+  height: 1px;
+  background: #f0f2f6;
+  margin: 6px 0;
+}
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #475569;
+  text-align: left;
+  transition: .15s;
+}
+.dropdown-item:hover {
+  background: #f8fafc;
+}
+.dropdown-item.logout {
+  color: #c64f58;
+}
+.dropdown-item.logout:hover {
+  background: #fff5f5;
+}
+
+/* Sidebar Guest Card */
+.sidebar-guest-card {
+  background: #f8faff;
+  border: 1px solid #e8ecfa;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guest-info strong {
+  display: block;
+  font-size: 11px;
+  color: #2b3548;
+}
+.guest-info span {
+  display: block;
+  font-size: 10px;
+  color: #7b869b;
+}
+.sidebar-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: #5365e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.sidebar-signin-btn:hover {
+  background: #4152d2;
+}
+
+/* Auth Modal Specifics */
+.auth-modal-card {
+  max-width: 440px;
+  padding: 24px;
+  animation: authEntrance .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes authEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.auth-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.auth-brand-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #4169f5, #7957e8);
+  color: white;
+  display: grid;
+  place-items: center;
+  font: 800 19px Manrope, sans-serif;
+  flex-shrink: 0;
+}
+.auth-modal-head h2 {
+  font-size: 16px;
+  margin: 0 0 2px;
+  color: #1e293b;
+}
+.auth-modal-head p {
+  font-size: 11px;
+  margin: 0;
+  color: #717d92;
+}
+.auth-tab-bar {
+  display: flex;
+  background: #f1f4f9;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.auth-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all .2s ease;
+}
+.auth-tab-btn.active {
+  background: #fff;
+  color: #4359df;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.auth-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.auth-field-icon {
+  position: absolute;
+  left: 11px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+.auth-input {
+  width: 100%;
+  padding: 10px 12px 10px 34px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  color: #1e293b !important;
+  background: #fff !important;
+}
+.auth-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
+.toggle-pw-btn {
+  position: absolute;
+  right: 10px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 3px;
+  display: grid;
+  place-items: center;
+}
+.toggle-pw-btn:hover {
+  color: #475569;
+}
+
+.auth-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 8px 11px;
+  border-radius: 7px;
+  border: 1px solid #e2e8f0;
+}
+.auth-actions {
+  margin-top: 6px;
+}
+.auth-submit-btn {
+  width: 100%;
+  padding: 11px;
+  font-size: 13px;
+  justify-content: center;
+}
+
+.auth-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #c53030;
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+.shake-animation {
+  animation: shakeError 0.35s ease-in-out;
+}
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.spinner-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinnerRotate 0.65s linear infinite;
+}
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+
 

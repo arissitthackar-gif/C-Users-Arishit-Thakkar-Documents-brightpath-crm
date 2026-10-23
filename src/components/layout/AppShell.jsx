@@ -7,7 +7,6 @@ export function AppShell({
   onAddLead, 
   leadsCount = 0, 
   overdueCount = 0,
-  userProfile,
   children 
 }) {
   return (
@@ -17,14 +16,12 @@ export function AppShell({
         setActivePage={setActivePage}
         leadsCount={leadsCount}
         overdueCount={overdueCount}
-        userProfile={userProfile}
       />
 
       <main className="main-content">
         <Topbar 
           activePage={activePage}
           onAddLead={onAddLead}
-          userProfile={userProfile}
         />
 
         <div className="page-content">

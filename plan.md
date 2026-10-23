@@ -21,9 +21,9 @@
 | Phase # | Feature Scope | Status | Milestone Commit / Notes |
 | :---: | :--- | :---: | :--- |
 | **Phase 1** | **Core Tooling & Project Structure** | **COMPLETED** | Commit `bed360d`: `.gitignore` hardened, `@supabase/supabase-js` & `lucide-react` installed, modular layout built, 0 lint/build errors. |
-| **Phase 2** | **Supabase Client & Config Guard** | *PENDING* | Implement `src/lib/supabaseClient.js`, runtime env validator, missing-credentials banner. |
+| **Phase 2** | **Supabase Client & Config Guard** | **COMPLETED** | Implemented `src/lib/supabaseClient.js`, runtime env validator, non-crashing fallback, and live Supabase connection. |
 | **Phase 3** | **Database Schema, Migrations & RLS** | **COMPLETED** | Created `supabase/migrations/` (`001_initial_schema.sql`, `002_row_level_security.sql`, `003_seed_demo_data.sql`, `000_full_setup.sql`) + In-App SQL Copy Utility in SettingsView. |
-| **Phase 4** | **Authentication & User Profiles** | *PENDING* | Supabase Auth login modal, session context, profile loader, role handling. |
+| **Phase 4** | **Authentication & User Profiles** | **COMPLETED** | Supabase Auth login/registration modal, session listener (`onAuthStateChange`), profile hydration from `public.profiles`, role handling. |
 | **Phase 5** | **Lead Management (CRUD)** | *PENDING* | Education enquiry CRUD, multi-filters (Course, Status, Source), search, persistence. |
 | **Phase 6** | **Follow-ups & Overdue Engine** | *PENDING* | Follow-up scheduler, overdue calculation (`due_at < now()`), mark completed. |
 | **Phase 7** | **Activity History & Audit Trail** | *PENDING* | Immutable timeline of lead creations, status transitions, follow-up callbacks. |

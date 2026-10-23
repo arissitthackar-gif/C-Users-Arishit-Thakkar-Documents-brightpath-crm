@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import AuthProvider from './features/auth/AuthContext';
+import { useAuth } from './features/auth/useAuth';
+import AuthModal from './features/auth/AuthModal';
 import AppShell from './components/layout/AppShell';
 import DashboardView from './features/dashboard/DashboardView';
 import LeadsView from './features/leads/LeadsView';
@@ -12,6 +15,15 @@ import { INITIAL_DEMO_LEADS, INITIAL_DEMO_FOLLOW_UPS } from './constants/crm';
 import './App.css';
 
 export function App() {
+  return (
+    <AuthProvider>
+      <CRMApp />
+    </AuthProvider>
+  );
+}
+
+function CRMApp() {
+  const { displayName, role } = useAuth();
   const [activePage, setActivePage] = useState('Dashboard');
   const [leads, setLeads] = useState(INITIAL_DEMO_LEADS);
   const [followUps, setFollowUps] = useState(INITIAL_DEMO_FOLLOW_UPS);
@@ -36,13 +48,6 @@ export function App() {
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
   const [leadForFollowUp, setLeadForFollowUp] = useState(null);
 
-  const userProfile = {
-    name: 'Arishit Thakkar',
-    role: 'Administrator',
-    initials: 'AT',
-    email: 'arishit@brightpath.edu'
-  };
-
   // Overdue follow-ups count for sidebar badge
   const now = new Date();
   const overdueCount = followUps.filter(
@@ -64,7 +69,7 @@ export function App() {
         id: `act-${Date.now()}`,
         type: 'created',
         description: `New enquiry captured for ${newLead.full_name} (${newLead.course_interest}).`,
-        actor: `${userProfile.name} (${userProfile.role})`,
+        actor: `${displayName} (${role})`,
         timestamp: 'Just now'
       },
       ...prev
@@ -87,7 +92,7 @@ export function App() {
         id: `act-${Date.now()}`,
         type: 'deleted',
         description: `Enquiry removed for ${targetLead?.full_name || 'Student'}.`,
-        actor: `${userProfile.name} (${userProfile.role})`,
+        actor: `${displayName} (${role})`,
         timestamp: 'Just now'
       },
       ...prev
@@ -113,7 +118,7 @@ export function App() {
         description: `Status changed to ${newStatus} for ${targetLead?.full_name}${
           lostReason ? ` (Reason: ${lostReason})` : ''
         }.`,
-        actor: `${userProfile.name} (${userProfile.role})`,
+        actor: `${displayName} (${role})`,
         timestamp: 'Just now'
       },
       ...prev
@@ -138,7 +143,7 @@ export function App() {
         id: `act-${Date.now()}`,
         type: 'followup_scheduled',
         description: `Follow-up callback scheduled for ${newFollowUp.lead_name}: "${newFollowUp.note}".`,
-        actor: `${userProfile.name} (${userProfile.role})`,
+        actor: `${displayName} (${role})`,
         timestamp: 'Just now'
       },
       ...prev
@@ -160,7 +165,7 @@ export function App() {
         id: `act-${Date.now()}`,
         type: 'followup_completed',
         description: `Follow-up completed for ${target?.lead_name || 'Student'}.`,
-        actor: `${userProfile.name} (${userProfile.role})`,
+        actor: `${displayName} (${role})`,
         timestamp: 'Just now'
       },
       ...prev
@@ -174,7 +179,6 @@ export function App() {
       onAddLead={() => setIsLeadModalOpen(true)}
       leadsCount={leads.length}
       overdueCount={overdueCount}
-      userProfile={userProfile}
     >
       {activePage === 'Dashboard' && (
         <DashboardView
@@ -207,7 +211,7 @@ export function App() {
 
       {activePage === 'Reports' && <ReportsView leads={leads} />}
 
-      {activePage === 'Settings' && <SettingsView userProfile={userProfile} />}
+      {activePage === 'Settings' && <SettingsView />}
 
       {/* Modals */}
       <LeadFormModal
@@ -226,6 +230,9 @@ export function App() {
         leads={leads}
         preselectedLead={leadForFollowUp}
       />
+
+      {/* Auth Modal */}
+      <AuthModal />
     </AppShell>
   );
 }
