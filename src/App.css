@@ -553,3 +553,76 @@ form input:focus, form select:focus, .search-input:focus { border-color: #7885ed
   place-items: center;
 }
 
+/* Phase 3 Migration Suite UI */
+.sql-setup-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 14px;
+}
+.setup-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #4359df;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.setup-step-item strong {
+  display: block;
+  font-size: 11px;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+.setup-step-item p {
+  margin: 0;
+  font-size: 10px;
+  color: #64748b;
+  line-height: 1.4;
+}
+.setup-step-item a {
+  color: #4359df;
+  text-decoration: underline;
+}
+.sql-code-preview {
+  margin-top: 12px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  max-height: 320px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+}
+.sql-code-preview pre {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .sql-setup-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 550px) {
+  .sql-setup-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+
