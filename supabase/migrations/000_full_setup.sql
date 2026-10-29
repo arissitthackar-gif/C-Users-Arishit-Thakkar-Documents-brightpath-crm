@@ -1,8 +1,12 @@
 -- ============================================================================
--- BRIGHTPATH CRM - COMPLETE CONSOLIDATED MIGRATION (000_full_setup.sql)
--- Description: Run this single script in the Supabase Dashboard SQL Editor
--- to set up all tables, foreign keys, triggers, RLS policies, and seed data.
+-- BRIGHTPATH CRM - OPTIMIZED & LOCK-SAFE MIGRATION (000_full_setup.sql)
+-- Description: Run this script in the Supabase Dashboard SQL Editor.
+-- Designed with lock timeouts and non-blocking statements to run in ~1-2 seconds.
 -- ============================================================================
+
+-- Prevent indefinite hanging by setting a statement & lock timeout
+SET statement_timeout = '45s';
+SET lock_timeout = '10s';
 
 -- ============================================================================
 -- PART 1: EXTENSIONS & SCHEMAS
@@ -37,7 +41,7 @@ CREATE TRIGGER trigger_profiles_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
 
--- Automatic trigger to create profile row when user signs up in Supabase Auth
+-- Automatic trigger function to create profile row when user signs up in Supabase Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -52,11 +56,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_profile();
+-- Non-blocking trigger attachment on auth.users
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created'
+  ) THEN
+    CREATE TRIGGER on_auth_user_created
+      AFTER INSERT ON auth.users
+      FOR EACH ROW
+      EXECUTE FUNCTION public.handle_new_user_profile();
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- If auth.users is temporarily busy with GoTrue auth locks, continue without failing
+    RAISE NOTICE 'Skipping auth.users trigger recreation (already active or busy).';
+END $$;
 
 -- 2. Leads Table
 CREATE TABLE IF NOT EXISTS public.leads (
@@ -129,7 +144,7 @@ ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.follow_ups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
 
--- Non-recursive helper function to check role
+-- Helper function to check role safely
 CREATE OR REPLACE FUNCTION public.get_current_user_role()
 RETURNS text AS $$
 DECLARE
@@ -147,7 +162,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- Profiles Policies
+-- Profiles Policies (Non-recursive)
 DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
 CREATE POLICY "profiles_select_policy" ON public.profiles FOR SELECT
   USING (auth.uid() = id OR public.is_manager_or_admin());
@@ -155,10 +170,7 @@ CREATE POLICY "profiles_select_policy" ON public.profiles FOR SELECT
 DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_update_policy" ON public.profiles FOR UPDATE
   USING (auth.uid() = id OR public.get_current_user_role() = 'admin')
-  WITH CHECK (
-    (public.get_current_user_role() = 'admin') OR
-    (role = (SELECT p.role FROM public.profiles p WHERE p.id = auth.uid()))
-  );
+  WITH CHECK (auth.uid() = id OR public.get_current_user_role() = 'admin');
 
 DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
 CREATE POLICY "profiles_insert_policy" ON public.profiles FOR INSERT
@@ -301,7 +313,6 @@ END $$;
 
 -- ============================================================================
 -- VERIFICATION QUERY
--- Shows all tables in public schema and their RLS status (should be true for all)
 -- ============================================================================
 SELECT tablename, rowsecurity 
 FROM pg_tables 

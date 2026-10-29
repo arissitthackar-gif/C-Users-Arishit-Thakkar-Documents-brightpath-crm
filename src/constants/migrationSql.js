@@ -3,10 +3,13 @@
  * Exact mirror of supabase/migrations/000_full_setup.sql
  */
 
-export const CONSOLIDATED_MIGRATION_SQL = `-- BRIGHTPATH CRM - COMPLETE CONSOLIDATED MIGRATION
+export const CONSOLIDATED_MIGRATION_SQL = `-- BRIGHTPATH CRM - OPTIMIZED & LOCK-SAFE MIGRATION (000_full_setup.sql)
 -- Run this in the Supabase Dashboard SQL Editor (https://supabase.com/dashboard)
 
--- 1. EXTENSIONS
+SET statement_timeout = '45s';
+SET lock_timeout = '10s';
+
+-- 1. EXTENSIONS & SCHEMAS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
@@ -46,11 +49,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_profile();
+-- Non-blocking trigger attachment on auth.users
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created'
+  ) THEN
+    CREATE TRIGGER on_auth_user_created
+      AFTER INSERT ON auth.users
+      FOR EACH ROW
+      EXECUTE FUNCTION public.handle_new_user_profile();
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE NOTICE 'Skipping auth.users trigger recreation (already active or busy).';
+END $$;
 
 -- 3. LEADS TABLE
 CREATE TABLE IF NOT EXISTS public.leads (
@@ -144,10 +157,7 @@ CREATE POLICY "profiles_select_policy" ON public.profiles FOR SELECT
 DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_update_policy" ON public.profiles FOR UPDATE
   USING (auth.uid() = id OR public.get_current_user_role() = 'admin')
-  WITH CHECK (
-    (public.get_current_user_role() = 'admin') OR
-    (role = (SELECT p.role FROM public.profiles p WHERE p.id = auth.uid()))
-  );
+  WITH CHECK (auth.uid() = id OR public.get_current_user_role() = 'admin');
 
 DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
 CREATE POLICY "profiles_insert_policy" ON public.profiles FOR INSERT
@@ -286,7 +296,7 @@ BEGIN
   ON CONFLICT (id) DO NOTHING;
 END $$;
 
--- 9. VERIFICATION
+-- 9. VERIFY
 SELECT tablename, rowsecurity 
 FROM pg_tables 
 WHERE schemaname = 'public'

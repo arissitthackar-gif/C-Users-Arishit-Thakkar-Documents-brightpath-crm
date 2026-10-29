@@ -2,6 +2,7 @@ import { useState } from 'react';
 import AuthProvider from './features/auth/AuthContext';
 import { useAuth } from './features/auth/useAuth';
 import AuthModal from './features/auth/AuthModal';
+import LoginPage from './features/auth/LoginPage';
 import AppShell from './components/layout/AppShell';
 import DashboardView from './features/dashboard/DashboardView';
 import LeadsView from './features/leads/LeadsView';
@@ -23,7 +24,7 @@ export function App() {
 }
 
 function CRMApp() {
-  const { displayName, role } = useAuth();
+  const { user, loading, displayName, role } = useAuth();
   const [activePage, setActivePage] = useState('Dashboard');
   const [leads, setLeads] = useState(INITIAL_DEMO_LEADS);
   const [followUps, setFollowUps] = useState(INITIAL_DEMO_FOLLOW_UPS);
@@ -170,6 +171,27 @@ function CRMApp() {
       },
       ...prev
     ]);
+  }
+
+  // Session verification loader
+  if (loading) {
+    return (
+      <div className="auth-loading-screen">
+        <div className="auth-loading-card">
+          <div className="auth-brand-badge large">
+            <span>B</span>
+          </div>
+          <h3>BrightPath Academy CRM</h3>
+          <p>Verifying secure staff session...</p>
+          <div className="spinner-loader large"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Unauthenticated visitors are directed to Login first
+  if (!user) {
+    return <LoginPage />;
   }
 
   return (
